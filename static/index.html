@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>SD Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===== Tela de Login ===== -->
+  <main id="view-login" class="screen visible">
+    <div class="container-center">
+      <div class="card auth-card">
+        <h1 class="title">SD Chat</h1>
+        <p class="subtitle">Entre para começar a conversar</p>
+
+        <label class="input">
+          <span>Email</span>
+          <input id="login_email" type="email" placeholder="voce@exemplo.com" />
+        </label>
+
+        <label class="input">
+          <span>Senha</span>
+          <input id="login_pass" type="password" placeholder="••••••••" />
+        </label>
+
+        <button id="btn_login" class="btn primary">Entrar</button>
+
+        <div class="muted">
+          Ainda não tem conta?
+          <button id="open-register" class="linklike">Criar conta</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== Tela do Chat ===== -->
+  <main id="view-chat" class="screen">
+    <header class="topbar">
+      <div class="brand">SD Chat</div>
+      <div class="me" id="me"></div>
+      <button id="btn_logout" class="btn ghost">Sair</button>
+    </header>
+
+    <div class="layout">
+      <aside class="panel left">
+        <section class="panel-section">
+          <div class="panel-header">
+            <h3>Usuários</h3> 
+            <button id="btn_list_users" class="btn small">Atualizar</button>
+          </div>
+          <ul id="users" class="list"></ul>
+        </section>
+
+        <section class="panel-section">
+          <div class="panel-header">
+            <h3>Novo grupo</h3>
+          </div>
+          <input id="group_title" class="input-plain" placeholder="Nome do grupo" />
+          <div class="hint">Clique nos usuários para selecionar para o grupo. Use <b>Ctrl+Clique</b> para abrir um chat 1:1 como grupo.</div>
+          <div id="selected_users" class="chips"></div>
+          <button id="btn_create_group" class="btn full">Criar grupo</button>
+        </section>
+
+      <section class="panel center">
+        <section class="panel-section">
+          <div class="panel-header">
+            <h3>Minhas conversas</h3>
+            <button id="btn_list_convs" class="btn small">Atualizar</button>
+          </div>
+          <ul id="convs" class="list"></ul>
+        </section>
+      </section>
+
+      <aside class="panel right">
+        <section class="panel-section">
+          <div id="current_conv" class="conv-title">Nenhuma conversa selecionada</div>
+          <div id="msgs" class="messages"></div>
+          <div class="sendbar">
+            <input id="msg_text" class="input-plain" placeholder="Digite sua mensagem..." />
+            <button id="btn_send" class="btn primary">Enviar</button>
+          </div>
+          <div class="actions-row">
+            <button id="btn_leave_group" class="btn danger" title="Sair do grupo atual">Sair do grupo</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ===== Modal de Cadastro ===== -->
+  <div id="modal" class="modal">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Criar conta</h3>
+        <button class="icon-btn" data-close aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="input">
+          <span>Nome</span>
+          <input id="reg_name" placeholder="Seu nome completo" />
+        </label>
+        <label class="input">
+          <span>Email</span>
+          <input id="reg_email" type="email" placeholder="voce@exemplo.com" />
+        </label>
+        <label class="input">
+          <span>Senha</span>
+          <input id="reg_pass" type="password" placeholder="••••••••" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button id="btn_reg" class="btn primary">Criar conta</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="client.js"></script>
+</body>
+</html>
