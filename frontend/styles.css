@@ -102,6 +102,12 @@ main {
     flex-direction: column;
     gap: 2%;
     overflow-y: scroll;
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
 }
 
 .message {
