@@ -15,10 +15,8 @@ body {
     font-family: 'Courier New', Courier, monospace;
 }
 
-.switch-tabs {
-    position: absolute;
-    bottom: 3vh;
-    font-size: larger;
+.tabs {
+    width: 80vw;
 }
 
 .tab {

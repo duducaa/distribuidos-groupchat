@@ -1,35 +1,51 @@
-import { callRPC } from "./js/rpc.js";
+import { callRPC, parseStruct } from "./js/rpc.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const switchButton = document.querySelector(".switch-tabs");
     const registerTab = document.querySelector(".register-tab");
     const messageTab = document.querySelector(".message-tab");
-    switchButton.addEventListener("click", () => {
-        if (!registerTab.classList.contains("none")) {
-            registerTab.classList.add("none");
-            messageTab.classList.remove("none");
-        } else {
-            registerTab.classList.remove("none");
-            messageTab.classList.add("none");
-        }
-    })
 
+    const messages = messageTab.querySelector(".messages");
+    const messageTemplate = messageTab.querySelector("#message-template");
     const sendButton = messageTab.querySelector(".msg-btn");
-    const msgInput = messageTab.getElementById("msg-content");
+    const updateButton = messageTab.querySelector(".update-btn");
+    const msgInput = messageTab.querySelector("#msg-content");
 
     sendButton.addEventListener("click", async (event) => {
         event.preventDefault();
-        const msg_value = msgInput.value;
-        const texto = await callRPC("sendMessage", [msg_value], ["string"]);
-        console.log(texto);
+        const text = msgInput.value;
+        const user_id = localStorage.getItem("id");
+        const username = localStorage.getItem("username");
+        callRPC("sendMessage", [
+            [text, "string"],
+            [user_id, "int"]])
+        .then(res => {
+            const clone = messageTemplate.content.cloneNode(true);
+            clone.querySelector(".username").textContent = username;
+            clone.querySelector(".message-content").textContent = text;
+            messages.appendChild(clone);
+        })
     })
 
+    updateButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        callRPC("update", [])
+        .then(res => {
+            console.log(res);
+        })
+    });
+
     const register = registerTab.querySelector(".connect");
-    const usernameInput = registerTab.getElementById("username");
+    const usernameInput = registerTab.querySelector("#username");
     register.addEventListener("click", async (event) => {
         event.preventDefault();
         const username = usernameInput.value;
-        const texto = await callRPC("register", [username], ["string"]);
-        console.log(texto);
+        callRPC("register", [[username, "string"]])
+        .then(res => {
+            const struct = parseStruct(res);
+            messageTab.classList.remove("none");
+            registerTab.classList.add("none");
+            localStorage.setItem("id", struct["id"]);
+            localStorage.setItem("username", struct["username"]);
+        });
     })
 })

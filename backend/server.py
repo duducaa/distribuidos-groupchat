@@ -1,5 +1,7 @@
 from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 from socketserver import ThreadingMixIn
+from datetime import datetime
+
 import sqlite3
 
 class CORSRequestHandler(SimpleXMLRPCRequestHandler):
@@ -16,38 +18,41 @@ class CORSRequestHandler(SimpleXMLRPCRequestHandler):
 class ThreadedServer(SimpleXMLRPCServer, ThreadingMixIn):
     pass
 
-def execute_sql(sql, command):
+def execute_sql(sql, args, command):
     db_path = "./db/database.sqlite"
 
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
 
-        with open("./db/DDL.sql", "r") as f:
-            sql = f.read()
-
-        cursor.executescript(sql)
+        cursor.execute(sql, args)
         data = cursor.fetchall()
 
         if command in ["insert", "delete"]:
             conn.commit()
-            return data
+            return cursor.lastrowid
         
-        return None
+        return data
 
 class Server:
     def register(self, username):
-        usernames = execute_sql("SELECT username FROM USERS;")
-        print(usernames)
-        new = True
-        if username in usernames:
-            new = False
-        return {"username": username, "new": new}
+        data = execute_sql(f"SELECT id, username FROM USERS WHERE username = ?;", (username,), "select")
+        new = len(data) == 0
+        if new:
+            id = execute_sql(f"INSERT INTO USERS (username) VALUES (?);", (username,), "insert")
+        else:
+            id, username = data[0]
+        return {"username": username, "id": id}
 
-    def sendMessage(self, text):
-        return {
-            "user": "usuario",
-            "message": text
-        }
+    def sendMessage(self, text, user_id):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return execute_sql(f"""
+        INSERT INTO MESSAGES (date_time, content, user_id) VALUES (?, ?, ?);""",
+        (now, text, user_id,), "insert")
+
+    def update(self):
+        data = execute_sql(f"SELECT * FROM MESSAGES", (), "select")
+        print(data)
+        return data
 
 server = ThreadedServer(("localhost", 8000), requestHandler=CORSRequestHandler)
 server.register_instance(Server())

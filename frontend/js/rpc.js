@@ -1,9 +1,9 @@
-async function callRPC(method, params, params_types) {
-    const params_str = "";
+async function callRPC(method, params) {
+    let params_str = "";
 
     for (let index = 0; index < params.length; index++) {
-        const param = params[index];
-        const type = params_types[index];
+        const param = params[index][0];
+        const type = params[index][1];
         
         params_str += `
             <param>
@@ -17,10 +17,11 @@ async function callRPC(method, params, params_types) {
     <methodCall>
         <methodName>${method}</methodName>
         <params>
-        ${params}
+        ${params_str}
         </params>
     </methodCall>
     `.trim();
+    console.log(xml)
 
     const resposta = await fetch("http://localhost:8000", {
     method: "POST",
@@ -30,8 +31,36 @@ async function callRPC(method, params, params_types) {
     body: xml
     });
 
-    const texto = await resposta.text();
-    return texto;
+    return await resposta.text();
 }
 
-export { callRPC };
+function parseStruct(xmlString) {
+    console.log(xmlString);
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+    const structNode = xmlDoc.querySelector("param > value > struct");
+    const obj = {};
+    const members = structNode.querySelectorAll("member");
+    members.forEach(member => {
+        const key = member.querySelector("name").textContent;
+        const valueNode = member.querySelector("value");
+        
+        let value;
+        if (valueNode.querySelector("string")) {
+            value = valueNode.querySelector("string").textContent;
+        } else if (valueNode.querySelector("int")) {
+            value = parseInt(valueNode.querySelector("int").textContent, 10);
+        } else if (valueNode.querySelector("boolean")) {
+            value = valueNode.querySelector("boolean").textContent === "1";
+        } else {
+            value = valueNode.textContent;
+        }
+
+        obj[key] = value;
+    });
+  return obj;
+}
+
+
+
+export { callRPC, parseStruct };
